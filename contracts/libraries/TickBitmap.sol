@@ -46,7 +46,11 @@ library TickBitmap {
         bool lte
     ) internal view returns (int24 next, bool initialized) {
         int24 compressed = tick / tickSpacing;
-        if (tick < 0 && tick % tickSpacing != 0) compressed--; // round towards negative infinity
+        if (tick < 0) {
+            if (tick % tickSpacing != 0) {
+                compressed--; // round towards negative infinity
+            }
+        }
 
         if (lte) {
             (int16 wordPos, uint8 bitPos) = position(compressed);

@@ -84,13 +84,17 @@ library SwapMath {
         }
 
         // cap the output amount to not exceed the remaining output amount
-        if (!exactIn && amountOut > uint256(-amountRemaining)) {
-            amountOut = uint256(-amountRemaining);
+        if (!exactIn) {
+            if (amountOut > uint256(-amountRemaining)) {
+                amountOut = uint256(-amountRemaining);
+            }
         }
 
-        if (exactIn && sqrtRatioNextX96 != sqrtRatioTargetX96) {
-            // we didn't reach the target, so take the remainder of the maximum input as fee
-            feeAmount = uint256(amountRemaining) - amountIn;
+        if (exactIn) {
+            if (sqrtRatioNextX96 != sqrtRatioTargetX96) {
+                // we didn't reach the target, so take the remainder of the maximum input as fee
+                feeAmount = uint256(amountRemaining) - amountIn;
+            }
         } else {
             feeAmount = FullMath.mulDivRoundingUp(amountIn, feePips, 1e6 - feePips);
         }

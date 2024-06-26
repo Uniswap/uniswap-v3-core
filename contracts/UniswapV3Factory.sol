@@ -19,9 +19,9 @@ contract UniswapV3Factory is IUniswapV3Factory, UniswapV3PoolDeployer, NoDelegat
     /// @inheritdoc IUniswapV3Factory
     mapping(address => mapping(address => mapping(uint24 => address))) public override getPool;
 
-    constructor() {
-        owner = msg.sender;
-        emit OwnerChanged(address(0), msg.sender);
+    constructor(address _owner) {
+        owner = _owner;
+        emit OwnerChanged(address(0), _owner);
 
         feeAmountTickSpacing[500] = 10;
         emit FeeAmountEnabled(500, 10);

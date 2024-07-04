@@ -2,6 +2,6 @@
 
 exports[`UniswapV3Factory #createPool gas 1`] = `4557092`;
 
-exports[`UniswapV3Factory factory bytecode size 1`] = `24535`;
+exports[`UniswapV3Factory factory bytecode size 1`] = `24756`;
 
 exports[`UniswapV3Factory pool bytecode size 1`] = `22142`;

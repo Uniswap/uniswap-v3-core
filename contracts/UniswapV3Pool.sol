@@ -53,6 +53,9 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     /// @inheritdoc IUniswapV3PoolImmutables
     uint128 public immutable override maxLiquidityPerTick;
 
+    /// after this limit is reached, the liquidity pool will create real pool
+    int256 public immutable buyLimit;
+
     struct Slot0 {
         // the current price
         uint160 sqrtPriceX96;
@@ -114,12 +117,13 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         _;
     }
 
-    constructor() {
+    constructor(int256 _buyLimit) {
         int24 _tickSpacing;
         (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(msg.sender).parameters();
         tickSpacing = _tickSpacing;
 
         maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(_tickSpacing);
+        buyLimit = _buyLimit;
     }
 
     /// @dev Common checks for valid tick inputs.
@@ -785,6 +789,9 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 
         emit Swap(msg.sender, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
         slot0.unlocked = true;
+        if(amount0 >= buyLimit) {
+            // create real pool
+        }
     }
 
     /// @inheritdoc IUniswapV3PoolActions

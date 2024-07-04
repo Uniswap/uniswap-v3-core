@@ -65,7 +65,7 @@ contract SetupUniswap {
     UniswapV3Factory factory;
 
     constructor(TestERC20 _token0, TestERC20 _token1) public {
-        factory = new UniswapV3Factory();
+        factory = new UniswapV3Factory(100 ether);
         token0 = _token0;
         token1 = _token1;
     }

@@ -114,12 +114,16 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         _;
     }
 
-    constructor() {
-        int24 _tickSpacing;
-        (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(msg.sender).parameters();
+    constructor(address _factory, address _token0, address _token1, uint24 _fee, int24 _tickSpacing, uint256 _feeg0, uint256 _feeg1,  uint128 _liquidity) {
+        factory = _factory;
+        token0 = _token0;
+        token1 = _token1;
+        fee = _fee;
         tickSpacing = _tickSpacing;
-
         maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(_tickSpacing);
+        feeGrowthGlobal0X128 = _feeg0;
+        feeGrowthGlobal1X128 = _feeg1;
+        liquidity = _liquidity;
     }
 
     /// @dev Common checks for valid tick inputs.
@@ -371,6 +375,19 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         }
     }
 
+    function getPosition(
+        address owner,
+        int24 tickLower,
+        int24 tickUpper
+    ) external view returns (uint128 liquidity,
+        uint256 feeGrowthInside0LastX128,
+        uint256 feeGrowthInside1LastX128,
+        uint128 tokensOwed0,
+        uint128 tokensOwed1) {
+        Position.Info memory position = positions.get(owner, tickLower, tickUpper);
+        return (position.liquidity, position.feeGrowthInside0LastX128, position.feeGrowthInside1LastX128, position.tokensOwed0, position.tokensOwed1);
+
+    }
     /// @dev Gets and updates a position with the given liquidity delta
     /// @param owner the owner of the position
     /// @param tickLower the lower tick of the position's tick range
@@ -463,7 +480,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     ) external override lock returns (uint256 amount0, uint256 amount1) {
         require(amount > 0);
         (, int256 amount0Int, int256 amount1Int) =
-            _modifyPosition(
+                        _modifyPosition(
                 ModifyPositionParams({
                     owner: recipient,
                     tickLower: tickLower,
@@ -477,15 +494,14 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
 
         uint256 balance0Before;
         uint256 balance1Before;
-        if (amount0 > 0) balance0Before = balance0();
-        if (amount1 > 0) balance1Before = balance1();
-        IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data);
-        if (amount0 > 0) require(balance0Before.add(amount0) <= balance0(), 'M0');
-        if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
+//        if (amount0 > 0) balance0Before = balance0();
+//        if (amount1 > 0) balance1Before = balance1();
+//        IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data);
+//        if (amount0 > 0) require(balance0Before.add(amount0) <= balance0(), 'M0');
+//        if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
 
         emit Mint(msg.sender, recipient, tickLower, tickUpper, amount, amount0, amount1);
     }
-
     /// @inheritdoc IUniswapV3PoolActions
     function collect(
         address recipient,
@@ -769,19 +785,19 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             : (state.amountCalculated, amountSpecified - state.amountSpecifiedRemaining);
 
         // do the transfers and collect payment
-        if (zeroForOne) {
-            if (amount1 < 0) TransferHelper.safeTransfer(token1, recipient, uint256(-amount1));
-
-            uint256 balance0Before = balance0();
-            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
-            require(balance0Before.add(uint256(amount0)) <= balance0(), 'IIA');
-        } else {
-            if (amount0 < 0) TransferHelper.safeTransfer(token0, recipient, uint256(-amount0));
-
-            uint256 balance1Before = balance1();
-            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
-            require(balance1Before.add(uint256(amount1)) <= balance1(), 'IIA');
-        }
+//        if (zeroForOne) {
+//            if (amount1 < 0) TransferHelper.safeTransfer(token1, recipient, uint256(-amount1));
+//
+//            uint256 balance0Before = balance0();
+//            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
+//            require(balance0Before.add(uint256(amount0)) <= balance0(), 'IIA');
+//        } else {
+//            if (amount0 < 0) TransferHelper.safeTransfer(token0, recipient, uint256(-amount0));
+//
+//            uint256 balance1Before = balance1();
+//            IUniswapV3SwapCallback(msg.sender).uniswapV3SwapCallback(amount0, amount1, data);
+//            require(balance1Before.add(uint256(amount1)) <= balance1(), 'IIA');
+//        }
 
         emit Swap(msg.sender, recipient, amount0, amount1, state.sqrtPriceX96, state.liquidity, state.tick);
         slot0.unlocked = true;

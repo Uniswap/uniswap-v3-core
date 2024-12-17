@@ -80,11 +80,11 @@ interface IUniswapV3PoolState {
 
     /// @notice Returns the information about a position by the position's key
     /// @param key The position's key is a hash of a preimage composed by the owner, tickLower and tickUpper
-    /// @return _liquidity The amount of liquidity in the position,
-    /// Returns feeGrowthInside0LastX128 fee growth of token0 inside the tick range as of the last mint/burn/poke,
-    /// Returns feeGrowthInside1LastX128 fee growth of token1 inside the tick range as of the last mint/burn/poke,
-    /// Returns tokensOwed0 the computed amount of token0 owed to the position as of the last mint/burn/poke,
-    /// Returns tokensOwed1 the computed amount of token1 owed to the position as of the last mint/burn/poke
+    /// @return _liquidity The amount of liquidity in the position
+    /// @return feeGrowthInside0LastX128 Fee growth of token0 inside the tick range as of the last mint/burn/poke
+    /// @return feeGrowthInside1LastX128 Fee growth of token1 inside the tick range as of the last mint/burn/poke
+    /// @return tokensOwed0 The computed amount of token0 owed to the position as of the last mint/burn/poke
+    /// @return tokensOwed1 The computed amount of token1 owed to the position as of the last mint/burn/poke
     function positions(bytes32 key)
         external
         view
@@ -98,12 +98,10 @@ interface IUniswapV3PoolState {
 
     /// @notice Returns data about a specific observation index
     /// @param index The element of the observations array to fetch
-    /// @dev You most likely want to use #observe() instead of this method to get an observation as of some amount of time
-    /// ago, rather than at a specific index in the array.
-    /// @return blockTimestamp The timestamp of the observation,
-    /// Returns tickCumulative the tick multiplied by seconds elapsed for the life of the pool as of the observation timestamp,
-    /// Returns secondsPerLiquidityCumulativeX128 the seconds per in range liquidity for the life of the pool as of the observation timestamp,
-    /// Returns initialized whether the observation has been initialized and the values are safe to use
+    /// @return blockTimestamp The timestamp of the observation
+    /// @return tickCumulative The tick multiplied by seconds elapsed for the life of the pool as of the observation timestamp
+    /// @return secondsPerLiquidityCumulativeX128 The seconds per in range liquidity for the life of the pool as of the observation timestamp
+    /// @return initialized Whether the observation has been initialized and the values are safe to use
     function observations(uint256 index)
         external
         view

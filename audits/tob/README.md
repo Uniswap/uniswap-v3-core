@@ -147,7 +147,7 @@ await E2E_mint_burn.test_burn_partial('<the _amount of the first test_burn_parti
 
 The verification was performed with the experimental branch [dev-evm-experiments](https://github.com/trailofbits/manticore/tree/dev-evm-experiments), which contains new optimizations and is a work in progress. Trail of Bits will ensure that the following properties hold once the branch has stabilized and been included in a Manticore release.
 
-For conveniance, we followed the pattern "if there is reacheable path, there is a bug".
+For convenience, we followed the pattern "if there is reachable path, there is a bug".
 
 To verify a property, run:
 

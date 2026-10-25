@@ -28,9 +28,6 @@ describe('FullMath', () => {
     it('reverts if output overflows uint256', async () => {
       await expect(fullMath.mulDiv(Q128, Q128, 1)).to.be.reverted
     })
-    it('reverts if output overflows uint256', async () => {
-      await expect(fullMath.mulDiv(Q128, Q128, 1)).to.be.reverted
-    })
     it('reverts on overflow with all max inputs', async () => {
       await expect(fullMath.mulDiv(MaxUint256, MaxUint256, MaxUint256.sub(1))).to.be.reverted
     })
